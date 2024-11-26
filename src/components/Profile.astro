@@ -1,0 +1,285 @@
+---
+import { Icon } from 'astro-icon/components';
+
+interface Project {
+    title: string;
+    description: string;
+    technologies: string[];
+    link?: string;
+}
+
+interface Props {
+    name: string;
+    github: string;
+    discord: string; 
+    description: string;
+    bio: string;
+    skills: string[];
+    profileImage?: string;
+    projects?: Project[];
+}
+
+const { 
+    name, 
+    github, 
+    discord, 
+    description, 
+    bio, 
+    skills, 
+    profileImage, 
+    projects = [] 
+} = Astro.props;
+
+const defaultProfileIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+    <circle cx="12" cy="7" r="4"></circle>
+</svg>
+`;
+---
+
+<li class="profile-card">
+    <div class="card-header">
+        {profileImage ? (
+            <img src={profileImage} alt={`${name}'s profile picture`} class="profile-icon" />
+        ) : (
+            <Fragment set:html={defaultProfileIcon} class="profile-icon" />
+        )}
+        <div class="header-content">
+            <h2>{name}</h2>
+            <p class="tagline"><em>{description}</em></p>
+        </div>
+    </div>
+
+    <section class="bio">
+        <h3>About Me</h3>
+        <p>{bio}</p>
+    </section>
+
+    <section class="skills-section">
+        <h3>Skills</h3>
+        <ul class="skills">
+            {skills.map(skill => (
+                <li>
+                    <span>{skill}</span>
+                </li>
+            ))}
+        </ul>
+    </section>
+
+    {projects.length > 0 && (
+        <section class="projects">
+            <h3>Projects</h3>
+            <ul>
+                {projects.map(project => (
+                    <li class="project-item">
+                        <div class="project-header">
+                            <h4>{project.title}</h4>
+                            {project.link && (
+                                <a href={project.link} target="_blank" rel="noopener noreferrer" class="project-link">
+                                    🔗
+                                </a>
+                            )}
+                        </div>
+                        <p>{project.description}</p>
+                        <div class="project-technologies">
+                            {project.technologies.map(tech => (
+                                <span class="tech-tag">{tech}</span>
+                            ))}
+                        </div>
+                    </li>
+                ))}
+            </ul>
+        </section>
+    )}
+
+    <div class="profile-links">
+        <a href={discord} target="_blank" rel="noopener noreferrer" class="profile-link" aria-label={`Discord profile of ${name}`}>
+            <Icon name="discord" />
+        </a>
+        <a href={github} target="_blank" rel="noopener noreferrer" class="profile-link" aria-label={`GitHub profile of ${name}`}>
+            <Icon name="github" />
+        </a>
+    </div>
+</li>
+
+<style>
+    p {
+        margin: 0;
+        font-size: 1rem;
+    }
+    h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: var(--normal);
+        transition: color 0.3s ease;
+        transition: transform 0.3s ease;
+    }
+    h2:hover {
+        transform: translateY(-2px);
+    }
+    h3 {
+        margin-top: 0;
+        color: var(--normal);
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 0.5rem;
+    }
+    section {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .profile-card {
+        list-style: none;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+        background: var(--back-ground);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+        color: #ecf0f1;
+        gap: 1rem;
+    }
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .header-content {
+        display: flex;
+        flex-direction: column;
+    }
+    .profile-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: rgba(255, 255, 255, 0.1);
+        border: 4px solid var(--accent);
+    }
+    .tagline {
+        margin: 0.5rem 0 0;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .skills {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        justify-content: center;
+    }
+    .skills li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+        cursor: default;
+        width: calc((100% - 1.5rem) / 4);
+        text-align: center; 
+        box-sizing: border-box;
+    }
+    .skills li:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        color: var(--normal);
+    }
+    @media (max-width: 768px) {
+        .skills li {
+            width: calc((100% - 1rem) / 3);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .skills li {
+            width: calc((100% - 0.5rem) / 2);
+        }
+    }
+    .projects ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .project-item {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .project-header h4 {
+        margin: 0;
+        color: var(--normal);
+    }
+    .project-link {
+        text-decoration: none;
+        color: var(--normal);
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+        font-size: 1.2rem;
+    }
+    .project-link:hover {
+        opacity: 1;
+    }
+    .project-technologies {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .tech-tag {
+        background: var(--back-ground);
+        color: var(--normal);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    .profile-links {
+        display: flex;
+        gap: 0.5rem;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+    }
+    .profile-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+    .profile-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1);
+    }
+    .profile-link svg {
+        width: 22px;
+        height: 22px;
+        fill: white;
+        transition: fill 0.3s ease;
+    }
+    .profile-link:hover svg {
+        fill: var(--normal);
+    }
+</style>
