@@ -74,11 +74,12 @@ const defaultProfileIcon = `
                 {projects.map(project => (
                     <li class="project-item">
                         <div class="project-header">
-                            <h4>{project.title}</h4>
-                            {project.link && (
-                                <a href={project.link} target="_blank" rel="noopener noreferrer" class="project-link">
-                                    🔗
+                            {project.link ? (
+                                <a href={project.link} target="_blank" rel="noopener noreferrer" class="project-title">
+                                    <h4>{project.title}</h4>
                                 </a>
+                            ) : (
+                                <h4>{project.title}</h4>
                             )}
                         </div>
                         <p>{project.description}</p>
@@ -91,7 +92,7 @@ const defaultProfileIcon = `
                 ))}
             </ul>
         </section>
-    )}
+    )}    
 
     <div class="profile-links">
         <a href={discord} target="_blank" rel="noopener noreferrer" class="profile-link" aria-label={`Discord profile of ${name}`}>
@@ -112,8 +113,7 @@ const defaultProfileIcon = `
         margin: 0;
         font-size: 1.8rem;
         color: var(--normal);
-        transition: color 0.3s ease;
-        transition: transform 0.3s ease;
+        transition: all 0.3s ease;
     }
     h2:hover {
         transform: translateY(-2px);
@@ -144,6 +144,10 @@ const defaultProfileIcon = `
         color: #ecf0f1;
         gap: 1rem;
     }
+    .project-title {
+        text-decoration: none;
+        color: inherit;
+    }
     .card-header {
         display: flex;
         align-items: center;
@@ -161,6 +165,10 @@ const defaultProfileIcon = `
         object-fit: cover;
         background: rgba(255, 255, 255, 0.1);
         border: 4px solid var(--accent);
+        transition: all 1s ease-out;
+    }
+    .profile-icon:hover {
+        transform: rotate(360deg);
     }
     .tagline {
         margin: 0.5rem 0 0;
@@ -251,6 +259,13 @@ const defaultProfileIcon = `
         padding: 0.2rem 0.5rem;
         border-radius: 4px;
         font-size: 0.8rem;
+        transition: all 0.3s ease;
+    }
+    .tech-tag:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        color: var(--normal);
     }
     .profile-links {
         display: flex;
