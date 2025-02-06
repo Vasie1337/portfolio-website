@@ -5,7 +5,6 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 
-# Add environment variables during build
 ARG GITHUB_TOKEN
 ENV GITHUB_TOKEN=${GITHUB_TOKEN}
 
