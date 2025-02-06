@@ -24,7 +24,12 @@ services:
       - traefik-public
 
   portfolio:
-    build: .
+    build:
+      context: .
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
