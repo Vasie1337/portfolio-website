@@ -2,7 +2,7 @@ FROM node:20-alpine as builder
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 COPY . .
 RUN npm run build
 
@@ -11,8 +11,12 @@ WORKDIR /app
 COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/package*.json ./
 
-# Install a lightweight production server
-RUN npm install --production serve
+# Install serve globally for a cleaner setup
+RUN npm install -g serve
+
+# Create a non-root user
+RUN adduser -D nodeuser
+USER nodeuser
 
 # Use serve to host the static files
-CMD ["./node_modules/.bin/serve", "-s", "dist", "-l", "80"] 
+CMD ["serve", "-s", "dist", "-l", "80"] 
