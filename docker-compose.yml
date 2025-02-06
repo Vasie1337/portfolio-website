@@ -1,5 +1,4 @@
 version: "3"
-
 services:
   portfolio:
     build: .
@@ -9,11 +8,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
-      - "traefik.http.routers.portfolio.tls=true"
-      - "traefik.http.routers.portfolio.tls.certresolver=acme"
+      - "traefik.http.routers.portfolio.entrypoints=websecure"
+      - "traefik.http.routers.portfolio.tls.certresolver=myresolver"
       - "traefik.http.services.portfolio.loadbalancer.server.port=80"
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.portfolio-http.rule=Host(`vasie.dev`)"
+      - "traefik.http.routers.portfolio-http.entrypoints=web"
+      - "traefik.http.routers.portfolio-http.middlewares=redirect-to-https"
+
 networks:
   generated_default:
     external: true
