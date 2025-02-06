@@ -10,7 +10,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
       - "traefik.http.routers.portfolio.tls=true"
-      - "traefik.http.routers.portfolio.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.portfolio.tls.certresolver=acme"
+      - "traefik.http.services.portfolio.loadbalancer.server.port=80"
     environment:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
 networks:
