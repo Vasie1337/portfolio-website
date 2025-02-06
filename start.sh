@@ -14,6 +14,6 @@ fi
 
 # Start services in detached mode
 echo "Starting services..."
-docker compose up -d
+docker-compose up -d
 
 echo "Services are starting up. Use './logs.sh' to view logs." 
