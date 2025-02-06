@@ -1,42 +1,20 @@
-version: "3"
-
+version: '3'
 services:
-  traefik:
-    image: traefik:v3.1
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - generated_default
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - letsencrypt:/letsencrypt
-    command:
-      - --api.dashboard=true
-      - --providers.docker.exposedByDefault=false
-      - --entrypoints.web.address=:80
-      - --entrypoints.web.http.redirections.entrypoint.to=websecure
-      - --entryPoints.web.http.redirections.entrypoint.scheme=https
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.websecure.http.tls.certresolver=myresolver
-      - --certificatesresolvers.myresolver.acme.email=YOUR_EMAIL
-      - --certificatesresolvers.myresolver.acme.tlschallenge=true
-      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
-
   portfolio:
-    build: .
-    restart: always
-    networks:
-      - generated_default
+    build:
+      context: .
+      args:
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
-      - "traefik.http.routers.portfolio.entrypoints=websecure"
+      - "traefik.http.routers.portfolio.tls=true"
       - "traefik.http.services.portfolio.loadbalancer.server.port=80"
-
-networks:
-  generated_default:
-    external: true
-
-volumes:
-  letsencrypt:
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
