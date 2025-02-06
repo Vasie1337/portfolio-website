@@ -1,20 +1,18 @@
+version: "3"
+
 services:
-  nodeapp:
-    build: 
-      context: .
-      args:
-        - GITHUB_TOKEN=${GITHUB_TOKEN}
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
+  portfolio:
+    build: .
     restart: always
+    networks:
+      - generated_default
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nodeapp.rule=Host(`vasie.dev`)"
-      - "traefik.http.routers.nodeapp.tls=true"
-      - "traefik.http.routers.nodeapp.tls.certresolver=letsencrypt"
-    networks:
-      - traefik-network
-
+      - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
+      - "traefik.http.routers.portfolio.tls=true"
+      - "traefik.http.routers.portfolio.tls.certresolver=letsencrypt"
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
 networks:
-  traefik-network:
+  generated_default:
     external: true
