@@ -11,7 +11,7 @@ services:
     expose:
       - "80"
     networks:
-      - proxy
+      - traefik_network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
@@ -27,6 +27,5 @@ services:
     restart: unless-stopped
 
 networks:
-  proxy:
+  traefik_network:
     external: true
-    name: traefik_proxy
