@@ -12,7 +12,7 @@ RUN npm run build
 
 FROM node:20-alpine
 WORKDIR /app
-COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
 RUN npm install -g serve
@@ -20,4 +20,4 @@ RUN npm install -g serve
 RUN adduser -D nodeuser
 USER nodeuser
 
-CMD ["serve", "-s", "dist", "-l", "80"] 
+CMD ["serve", "-s", "dist", "-l", "3000"] 

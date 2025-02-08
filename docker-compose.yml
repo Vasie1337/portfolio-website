@@ -1,21 +1,40 @@
-version: '3'
+version: "3.3"
+
 services:
-  portfolio:
+  webapp:
     build:
       context: .
       args:
         - GITHUB_TOKEN=${GITHUB_TOKEN}
-    environment:
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
+    container_name: node-webapp
+    restart: unless-stopped
     expose:
-      - "80"
+      - "3000"
+    ports:
+      - "3000:3000"
+    networks:
+      - traefik-net
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.portfolio.rule=Host(`vasie.dev`)"
-      - "traefik.http.services.portfolio.loadbalancer.server.port=80"
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    restart: unless-stopped
+      - "traefik.docker.network=traefik-net"
+
+      - "traefik.http.routers.webapp.rule=Host(`dev.vasie-dma.com`)"
+      - "traefik.http.routers.webapp.entrypoints=websecure"
+      - "traefik.http.routers.webapp.tls=true"
+      - "traefik.http.routers.webapp.tls.certresolver=letsencrypt"
+
+      - "traefik.http.services.webapp.loadbalancer.server.port=3000"
+
+      - "traefik.http.middlewares.security.headers.sslRedirect=true"
+      - "traefik.http.middlewares.security.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.security.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.security.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.security.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.security.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.security.headers.stsPreload=true"
+
+      - "traefik.http.routers.webapp.middlewares=security"
+
+networks:
+  traefik-net:
+    external: true
