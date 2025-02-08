@@ -194,6 +194,9 @@ const sortedRepos = processedRepos
 </li>
 
 <style>
+    html {
+        scroll-behavior: smooth;
+    }
     p {
         margin: 0;
         font-size: 1rem;
@@ -536,3 +539,9 @@ const sortedRepos = processedRepos
         border-radius: 6px;
     }
 </style>
+
+<script>
+    if (typeof window !== 'undefined') {
+        window.history.scrollRestoration = 'manual';
+    }
+</script>
