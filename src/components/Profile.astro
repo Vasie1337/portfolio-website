@@ -10,7 +10,7 @@ interface Props {
 
 interface LanguageStats {
     name: string;
-    count: number;
+    count: string;
     color: string;
 }
 
@@ -37,6 +37,20 @@ const [userResponse, reposResponse] = await Promise.all([
 const userData = userResponse.ok ? await userResponse.json() : null;
 const repos = reposResponse.ok ? await reposResponse.json() : [];
 
+const repoLanguages = await Promise.all(
+    repos.map(async (repo) => {
+        const langResponse = await fetch(repo.languages_url, { headers });
+        return langResponse.ok ? await langResponse.json() : {};
+    })
+);
+
+const languageTotals = repoLanguages.reduce((acc: Record<string, number>, languages) => {
+    Object.entries(languages).forEach(([lang, bytes]) => {
+        acc[lang] = (acc[lang] || 0) + Number(bytes);
+    });
+    return acc;
+}, {});
+
 const languageColors = {
     "C++": "#f34b7d",
     "Python": "#3572A5",
@@ -60,25 +74,31 @@ const processedRepos = repos.map(repo => ({
     topics: repo.topics || []
 }));
 
-const stats = {
+const totalRepos = processedRepos.length;
+
+const languageStats = Object.entries(languageTotals)
+    .map(([name, bytes]) => {
+        const totalBytes = Object.values(languageTotals).reduce((a, b) => Number(a) + Number(b), 0);
+        const percentage = (Number(bytes) / Number(totalBytes)) * 100;
+        return {
+            name,
+            count: `${percentage < 0.1 ? '< 0.1' : percentage.toFixed(1)}%`,
+            color: languageColors[name] || '#666'
+        };
+    })
+    .sort((a, b) => {
+        const aNum = Number(a.count.replace(/[<%]/g, ''));
+        const bNum = Number(b.count.replace(/[<%]/g, ''));
+        return bNum - aNum;
+    })
+    .slice(0, 10);
+
+    const stats = {
     totalStars: processedRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0),
-    totalRepos: processedRepos.length,
-    languages: Object.entries(
-        processedRepos.reduce((acc: Record<string, number>, repo) => {
-            if (repo.language) {
-                acc[repo.language] = (acc[repo.language] || 0) + 1;
-            }
-            return acc;
-        }, {})
-    )
-    .map(([name, count]): LanguageStats => ({
-        name,
-        count: Number(count),
-        color: languageColors[name] || '#666'
-    }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10)
+    totalRepos,
+    languages: languageStats
 };
+
 
 const sortedRepos = processedRepos
     .sort((a, b) => b.stargazers_count - a.stargazers_count)
@@ -118,23 +138,12 @@ const sortedRepos = processedRepos
                     </div>
                 </div>
                 <div class="languages-section">
-                    <h4>Most Used Languages</h4>
-                    <div class="language-bars">
+                    <h4>Used Languages</h4>
+                    <div class="language-list">
                         {stats.languages.map(lang => (
-                            <div class="language-bar-wrapper">
-                                <div class="language-info">
-                                    <span class="language-name">
-                                        <span class="language-dot" style={`background-color: ${lang.color}`}></span>
-                                        {lang.name}
-                                    </span>
-                                    <span class="language-count">{lang.count} repos</span>
-                                </div>
-                                <div class="language-bar-bg">
-                                    <div 
-                                        class="language-bar" 
-                                        style={`width: ${(Number(lang.count) / Number(stats.totalRepos) * 100)}%; background-color: ${lang.color}`}>
-                                    </div>
-                                </div>
+                            <div class="language-item">
+                                <span class="language-dot" style={`background-color: ${lang.color}`}></span>
+                                {lang.name}
                             </div>
                         ))}
                     </div>
@@ -495,30 +504,21 @@ const sortedRepos = processedRepos
         font-size: 1.1rem;
     }
 
-    .language-bars {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
+    .language-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8rem;
         padding: 0.5rem;
     }
 
-    .language-bar-wrapper {
-        display: flex;
-        flex-direction: column;
-        gap: 0.3rem;
-    }
-
-    .language-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.9rem;
-    }
-
-    .language-name {
+    .language-item {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
     }
 
     .language-dot {
@@ -526,50 +526,6 @@ const sortedRepos = processedRepos
         height: 8px;
         border-radius: 50%;
         display: inline-block;
-    }
-
-    .language-count {
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 0.8rem;
-    }
-
-    .language-bar-bg {
-        width: 100%;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 2px;
-        overflow: hidden;
-    }
-
-    .language-bar {
-        height: 100%;
-        border-radius: 2px;
-        transition: width 0.3s ease, transform 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .language-bar::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-        );
-        transform: translateX(-100%);
-        animation: shimmer 2s infinite;
-    }
-
-    @keyframes shimmer {
-        100% {
-            transform: translateX(100%);
-        }
     }
 
     .error-message {
