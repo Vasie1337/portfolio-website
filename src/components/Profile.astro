@@ -62,7 +62,12 @@ const languageColors = {
     "CSS": "#563d7c",
     "Rust": "#dea584",
     "C#": "#178600",
-    "Assembly": "#6E4C13"
+    "Assembly": "#6E4C13",
+    "C Shell": "#89e051",
+    "Astro": "#ff5a03",
+    "Dockerfile": "#384d54",
+    "PowerShell": "#012456",
+    "Batchfile": "#C1F12E"
 };
 
 const processedRepos = repos.map(repo => ({
@@ -91,7 +96,7 @@ const languageStats = Object.entries(languageTotals)
         const bNum = Number(b.count.replace(/[<%]/g, ''));
         return bNum - aNum;
     })
-    .slice(0, 10);
+    .slice(0, 20);
 
     const stats = {
     totalStars: processedRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0),
@@ -101,8 +106,7 @@ const languageStats = Object.entries(languageTotals)
 
 
 const sortedRepos = processedRepos
-    .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    .slice(0, 6);
+    .sort((a, b) => b.stargazers_count - a.stargazers_count);
 ---
 
 <li class="profile-card">
